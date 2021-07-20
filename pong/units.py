@@ -1,14 +1,35 @@
+from __future__ import annotations
+
 import random
+from typing import TYPE_CHECKING
 
 import pygame
 
 from .settings import HEIGHT, WIDTH
 
+if TYPE_CHECKING:
+    from .game import Game
 
-class Ball:
-    """The ball sprite, all stuff related to the ball is included there."""
 
-    def __init__(self, game) -> None:
+class BaseUnit:
+    """The base class for all appearing units in the game."""
+
+    def __init__(self) -> None:
+        self.game: Game
+        self.rect: pygame.Rect
+
+    def animation(self) -> None:
+        """The animation method that must be overridden by child classes."""
+        raise NotImplementedError
+
+
+class Ball(BaseUnit):
+    """The ball unit, all stuff related to the ball is included there.
+
+    This class inherits from `pong.units.BaseUnit`.
+    """
+
+    def __init__(self, game: Game) -> None:
         self.game = game
         self.rect = pygame.Rect(WIDTH / 2 - 15, HEIGHT / 2 - 15, 30, 30)
         self.speed_x = 7 * random.choice((1, -1))
@@ -24,10 +45,14 @@ class Ball:
         if self.rect.top <= 0 or self.rect.bottom >= HEIGHT:
             self.speed_y *= -1
 
-        if self.rect.left <= 0 or self.rect.right >= WIDTH:
+        if self.rect.left <= 0:
+            self.game.counter['player'] += 1
+            self.reset()
+        if self.rect.right >= WIDTH:
+            self.game.counter['opponent'] += 1
             self.reset()
 
-        if self.rect.colliderect(player.rect) or self.rect.colliderect(opponent):
+        if self.rect.colliderect(player.rect) or self.rect.colliderect(opponent.rect):
             self.speed_x *= -1
 
     def reset(self) -> None:
@@ -36,8 +61,13 @@ class Ball:
         self.speed_y *= random.choice((1, -1))
 
 
-class Player:
-    def __init__(self, game) -> None:
+class Player(BaseUnit):
+    """The player, all stuff related to the player is included there.
+
+    This class inherits from `pong.units.BaseUnit`.
+    """
+
+    def __init__(self, game: Game) -> None:
         self.rect = pygame.Rect(WIDTH - 20, HEIGHT / 2 - 70, 10, 140)
         self.speed = 0
 
@@ -50,8 +80,13 @@ class Player:
             self.rect.bottom = HEIGHT
 
 
-class Opponent:
-    def __init__(self, game) -> None:
+class Opponent(BaseUnit):
+    """The opponent, all stuff related to the opponent is included there.
+
+    This class inherits from `pong.units.BaseUnit`.
+    """
+
+    def __init__(self, game: Game) -> None:
         self.game = game
         self.rect = pygame.Rect(10, HEIGHT / 2 - 70, 10, 140)
         self.speed = 7

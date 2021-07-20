@@ -4,15 +4,17 @@ __all__ = (
     'WIDTH',
     'HEIGHT',
     'FPS',
+    'MAX_SCORES_PER_MATCH',
     'GREY',
     'BG_COLOR',
 )
 
 # Main Window
-TITLE = 'Pong!'
+TITLE = 'Pongasyl!'
 WIDTH = 1280
 HEIGHT = 700
 FPS = 60
+MAX_SCORES_PER_MATCH = 10
 
 # Colors.
 LIGHT_THEME = False
