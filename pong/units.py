@@ -35,7 +35,14 @@ class Ball(BaseUnit):
         self.speed_x = 7 * random.choice((1, -1))
         self.speed_y = 7 * random.choice((1, -1))
 
+    def reset(self) -> None:
+        """Ball-position resetting method to ease up ball bouncing stuff."""
+        self.rect.center = (WIDTH / 2, HEIGHT / 2)
+        self.speed_x *= random.choice((1, -1))
+        self.speed_y *= random.choice((1, -1))
+
     def animation(self) -> None:
+        """The way of animating the ball: `movements`, `physics`, `score count`."""
         player = self.game.player
         opponent = self.game.opponent
 
@@ -48,17 +55,13 @@ class Ball(BaseUnit):
         if self.rect.left <= 0:
             self.game.counter['player'] += 1
             self.reset()
+
         if self.rect.right >= WIDTH:
             self.game.counter['opponent'] += 1
             self.reset()
 
         if self.rect.colliderect(player.rect) or self.rect.colliderect(opponent.rect):
             self.speed_x *= -1
-
-    def reset(self) -> None:
-        self.rect.center = (WIDTH / 2, HEIGHT / 2)
-        self.speed_x *= random.choice((1, -1))
-        self.speed_y *= random.choice((1, -1))
 
 
 class Player(BaseUnit):
@@ -72,6 +75,9 @@ class Player(BaseUnit):
         self.speed = 0
 
     def animation(self) -> None:
+        """
+        The way of animating the player: `position control`, `bottom-top movement`.
+        """
         self.rect.y += self.speed
         if self.rect.top <= 0:
             self.rect.top = 0
@@ -92,6 +98,12 @@ class Opponent(BaseUnit):
         self.speed = 7
 
     def animation(self) -> None:
+        """The way of animating the opponent, kind of AI movement.
+
+        There are several parameters to look at:
+            1. Ball's X&Y positions.
+            2. If the AI goes to far, reset position to the previous.
+        """
         ball = self.game.ball
         player = self.game.player
 
